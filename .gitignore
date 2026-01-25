@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+
+# Model weights and outputs
+yolov8n.pt
+frame.png
+yolo_out.png
+
+# Temporary
+*.log
+*.tmp
