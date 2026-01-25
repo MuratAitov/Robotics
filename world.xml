@@ -1,0 +1,23 @@
+<mujoco model="vision_world">
+  <compiler angle="radian" coordinate="local"/>
+  <option timestep="0.002"/>
+
+  <asset>
+    <mesh name="sneaker_mesh" file="Sneakers/sneaker/sneaker.obj" scale="1 1 1"/>
+  </asset>
+
+  <worldbody>
+    <geom type="plane" size="5 5 0.1" rgba="0.9 0.9 0.9 1"/>
+
+    <light pos="0 0 3" dir="0 0 -1" diffuse="1 1 1"/>
+    <light pos="1 1 2" dir="-1 -1 -1" diffuse="0.6 0.6 0.6"/>
+
+    <body name="sneaker" pos="0 0 0.22">
+      <freejoint/>
+      <geom type="mesh" mesh="sneaker_mesh" rgba="1 1 1 1"/>
+    </body>
+
+    <camera name="cam0" pos="0.8 0 0.4"
+            xyaxes="0 -1 0 0 0 1" fovy="45"/>
+  </worldbody>
+</mujoco>
