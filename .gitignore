@@ -15,3 +15,6 @@ yolo_out.png
 # Temporary
 *.log
 *.tmp
+
+# Assets (large)
+Sneakers/
