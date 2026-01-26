@@ -1,23 +1,103 @@
-<mujoco model="vision_world">
-  <compiler angle="radian" coordinate="local"/>
-  <option timestep="0.002"/>
+<mujoco model="sneaker_world">
+  <compiler angle="degree" coordinate="local"/>
+  <option timestep="0.002" gravity="0 0 -9.81"/>
+
+  <visual>
+    <global offwidth="1280" offheight="720"/>
+    <quality shadowsize="4096"/>
+  </visual>
 
   <asset>
-    <mesh name="sneaker_mesh" file="Sneakers/sneaker/sneaker.obj" scale="1 1 1"/>
+    <!-- Меши -->
+    <mesh name="brown_mesh" file="Sneakers/brown_sneakers/brown_sneakers.obj" scale="0.012 0.012 0.012"/>
+    <mesh name="converse_mesh" file="Sneakers/converse__free/converse__free.obj" scale="0.07 0.07 0.07"/>
+    <mesh name="sneakers_mesh" file="Sneakers/sneakers/sneakers.obj" scale="2.1 2.1 2.1"/>
+
+    <!-- Текстуры -->
+    <texture name="brown_tex" type="2d" file="Sneakers/brown_sneakers/rb_r_diffuse.png"/>
+    <texture name="converse_tex" type="2d" file="Sneakers/converse__free/material0_baseColor.png"/>
+    <texture name="sneakers_tex" type="2d" file="Sneakers/sneakers/cons_mat_baseColor.png"/>
+
+    <!-- Пол и пьедесталы -->
+    <texture name="floor_tex" type="2d" builtin="checker" rgb1="0.9 0.9 0.9" rgb2="0.75 0.75 0.75" width="512" height="512"/>
+    <texture name="pedestal_tex" type="2d" builtin="gradient" rgb1="0.25 0.25 0.3" rgb2="0.15 0.15 0.2" width="64" height="64"/>
+
+    <!-- Материалы -->
+    <material name="brown_mat" texture="brown_tex" specular="0.4" shininess="0.6"/>
+    <material name="converse_mat" texture="converse_tex" specular="0.3"/>
+    <material name="sneakers_mat" texture="sneakers_tex" specular="0.3"/>
+    <material name="floor_mat" texture="floor_tex" texrepeat="16 16" reflectance="0.2"/>
+    <material name="pedestal_mat" texture="pedestal_tex" specular="0.6" shininess="0.9" reflectance="0.1"/>
   </asset>
 
   <worldbody>
-    <geom type="plane" size="5 5 0.1" rgba="0.9 0.9 0.9 1"/>
+    <!-- Пол -->
+    <geom name="floor" type="plane" size="3 3 0.1" material="floor_mat"/>
 
-    <light pos="0 0 3" dir="0 0 -1" diffuse="1 1 1"/>
-    <light pos="1 1 2" dir="-1 -1 -1" diffuse="0.6 0.6 0.6"/>
+    <!-- Освещение улучшенное -->
+    <light pos="0 0 3" dir="0 0 -1" diffuse="1 1 1" specular="0.3 0.3 0.3" castshadow="true"/>
+    <light pos="1.5 -1.5 2" dir="-0.5 0.5 -0.7" diffuse="0.5 0.5 0.6"/>
+    <light pos="-1.5 -1.5 2" dir="0.5 0.5 -0.7" diffuse="0.5 0.5 0.6"/>
+    <light pos="0 2 1.5" dir="0 -0.7 -0.5" diffuse="0.4 0.4 0.4"/>
 
-    <body name="sneaker" pos="0 0 0.22">
-      <freejoint/>
-      <geom type="mesh" mesh="sneaker_mesh" rgba="1 1 1 1"/>
+    <!-- ============ ЗОНА 1: ВИТРИНА С ПЬЕДЕСТАЛАМИ ============ -->
+
+    <!-- Пьедестал 1 - Brown Sneaker (смотрит вперёд) -->
+    <body name="pedestal1_body" pos="-0.35 -0.5 0.0">
+      <geom name="pedestal1" type="cylinder" size="0.1 0.06" pos="0 0 0.06" material="pedestal_mat"/>
+      <geom name="brown_display" type="mesh" mesh="brown_mesh" material="brown_mat"
+            pos="0 0 0.12" euler="-90 180 180"/>
     </body>
 
-    <camera name="cam0" pos="0.8 0 0.4"
-            xyaxes="0 -1 0 0 0 1" fovy="45"/>
+  
+    <!-- Пьедестал 3 - Sneakers (смотрит вперёд) -->
+    <body name="pedestal3_body" pos="0.35 -0.5 0.0">
+      <geom name="pedestal3" type="cylinder" size="0.1 0.06" pos="0 0 0.06" material="pedestal_mat"/>
+      <geom name="sneakers_display" type="mesh" mesh="sneakers_mesh" material="sneakers_mat"
+            pos="0 0 0.12" euler="-90 180 180"/>
+    </body>
+
+    <!-- ============ ЗОНА 2: РАЗБРОСАННЫЕ КРОССОВКИ ============ -->
+
+    <!-- Brown - лежит на боку -->
+    <geom name="divider_wall" type="box" size="1.2 0.02 0.3" pos="0 -0.2 0.3" rgba="0.2 0.2 0.25 1"/>
+
+    <body name="brown_1" pos="-0.3 0.35 0.08">
+      <freejoint/>
+      <geom type="mesh" mesh="brown_mesh" material="brown_mat" euler="60 25 10" mass="0.3"/>
+    </body>
+
+    <!-- Converse - слегка наклонён -->
+    <body name="converse_1" pos="0.15 0.5 0.1">
+      <freejoint/>
+      <geom type="mesh" mesh="converse_mesh" material="converse_mat" euler="80 0 -40" mass="0.3"/>
+    </body>
+
+    <!-- Sneakers - перевёрнут -->
+    <body name="sneakers_1" pos="0.45 0.3 0.12">
+      <freejoint/>
+      <geom type="mesh" mesh="sneakers_mesh" material="sneakers_mat" euler="-70 15 30" mass="0.3"/>
+    </body>
+
+    <!-- Brown 2 - подошвой вверх -->
+    <body name="brown_2" pos="-0.05 0.25 0.1">
+      <freejoint/>
+      <geom type="mesh" mesh="brown_mesh" material="brown_mat" euler="-90 0 60" mass="0.3"/>
+    </body>
+
+    <!-- ============ КАМЕРЫ ============ -->
+
+    <!-- Витрина - красивый ракурс на пьедесталы -->
+    <camera name="pedestals_cam" pos="0 -1.5 0.35" xyaxes="1 0 0 0 0.2 1" fovy="50"/>
+
+    <!-- Разбросанные - вид сверху под углом (смотрит на зону y>0) -->
+    <camera name="scattered_cam" pos="0.5 -0.1 0.55" xyaxes="0.9 1 0 0 0 1" fovy="65"/>
+
+    <!-- Вид сверху на всё -->
+    <camera name="top_cam" pos="0 -0.05 1.3" xyaxes="1 0 0 0 1 0" fovy="70"/>
+
+    <!-- Общий вид - видно и пьедесталы и разбросанные -->
+    <camera name="overview_cam" pos="-0.9 -1.0 1.2" xyaxes="-0.774 0.634 0 0.388 -0.474 0.792" fovy="70"/>
+
   </worldbody>
 </mujoco>

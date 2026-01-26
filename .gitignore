@@ -11,6 +11,9 @@ __pycache__/
 yolov8n.pt
 frame.png
 yolo_out.png
+outputs/
+data/
+*.pt
 
 # Temporary
 *.log

@@ -1,75 +1,65 @@
 # MuJoCo Sneaker Vision
 
-Render sneaker models in MuJoCo and run YOLO detection on the rendered frames.
+Render sneaker models in MuJoCo and run YOLO detection on rendered frames.
 
-## What’s inside
+## What's inside
 
-- MuJoCo world with a sneaker mesh (`world.xml`)
+- MuJoCo world with sneaker meshes (`world.xml`)
 - Viewer script for interactive inspection (`run_viewer.py`)
 - Renderer + YOLO inference (`run_yolo.py`)
-- Multiple sneaker assets in `Sneakers/`
+- Sneaker assets in `Sneakers/`
+- YOLO training notes in `YOLO.md`
 
 ## Folder structure
 
 ```
 .
-├── Sneakers/                 # 3D assets (OBJ + MTL + textures)
-├── previews/                 # Preview renders of assets
-├── run_viewer.py             # MuJoCo GUI viewer
-├── run_yolo.py               # Render + YOLO inference
-├── world.xml                 # Scene definition
-└── requirements.txt
++-- Sneakers/                 # 3D assets (OBJ + MTL + textures)
++-- outputs/                  # Generated images (frames + detections)
++-- previews/                 # Preview renders of assets
++-- run_viewer.py             # MuJoCo GUI viewer
++-- run_yolo.py               # Render + YOLO inference
++-- world.xml                 # Scene definition
++-- requirements.txt
++-- YOLO.md                   # Training, inference, and improvements
 ```
 
-## Setup
+## Setup (Windows)
 
 Create and activate a virtual environment:
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
+```powershell
+py -3.11 -m venv .venv
+.\.venv\Scripts\Activate.ps1
 ```
 
 Install dependencies:
 
-```bash
+```powershell
 pip install -r requirements.txt
 ```
-
-### macOS (Apple Silicon)
-
-MuJoCo requires **arm64** Python on Apple Silicon.
-If you see an error about x86_64/Rosetta, install arm64 Python and recreate the venv.
 
 ## Run
 
 ### Viewer (interactive)
 
-- **macOS:**
-
-```bash
-mjpython run_viewer.py
-```
-
-- **Linux/Windows:**
-
-```bash
+```powershell
 python run_viewer.py
 ```
 
 ### Render + YOLO
 
-```bash
+```powershell
 python run_yolo.py
 ```
 
 Outputs:
-- `frame.png` – raw render
-- `yolo_out.png` – YOLO overlay
+- `outputs/frames/` - raw renders
+- `outputs/yolo/` - YOLO overlays
 
-## Changing the sneaker model
+## Changing sneaker models
 
-Edit the mesh path in `world.xml`, for example:
+Edit the mesh paths in `world.xml`, for example:
 
 ```xml
 <mesh name="sneaker_mesh" file="Sneakers/sneaker/sneaker.obj" scale="1 1 1"/>
@@ -77,5 +67,5 @@ Edit the mesh path in `world.xml`, for example:
 
 ## Notes
 
-- Default YOLO models are **not trained on sneakers**, so detections may be weak.
-- For good results, fine-tune YOLO or generate a synthetic dataset in MuJoCo.
+- Default YOLO models are not trained for sneakers, so detections may be weak.
+- Fine-tune YOLO on footwear or render synthetic data for best results.

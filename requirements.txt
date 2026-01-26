@@ -1,3 +1,4 @@
 mujoco
 ultralytics
 opencv-python
+warp-lang
