@@ -1,0 +1,65 @@
+<mujoco model="pose_estimation_test">
+  <compiler angle="degree" coordinate="local"/>
+  <option timestep="0.002" gravity="0 0 -9.81"/>
+
+  <visual>
+    <global offwidth="1280" offheight="720"/>
+    <quality shadowsize="4096"/>
+  </visual>
+
+  <asset>
+    <!-- Sneakers mesh -->
+    <mesh name="sneakers_mesh" file="Sneakers/sneakers/sneakers.obj" scale="2.1 2.1 2.1"/>
+    <texture name="sneakers_tex" type="2d" file="Sneakers/sneakers/cons_mat_baseColor.png"/>
+    <material name="sneakers_mat" texture="sneakers_tex" specular="0.3"/>
+
+    <!-- Стол -->
+    <texture name="table_tex" type="2d" builtin="flat" rgb1="0.6 0.55 0.5" width="64" height="64"/>
+    <material name="table_mat" texture="table_tex" specular="0.2"/>
+
+    <!-- Пол -->
+    <texture name="floor_tex" type="2d" builtin="checker" rgb1="0.3 0.3 0.32" rgb2="0.25 0.25 0.27" width="256" height="256"/>
+    <material name="floor_mat" texture="floor_tex" texrepeat="8 8"/>
+  </asset>
+
+  <worldbody>
+    <!-- Пол -->
+    <geom name="floor" type="plane" size="2 2 0.1" material="floor_mat"/>
+
+    <!-- Освещение -->
+    <light pos="0 0 2.5" dir="0 0 -1" diffuse="0.9 0.9 0.9" specular="0.3 0.3 0.3" castshadow="true"/>
+    <light pos="1.5 -1.5 2" dir="-0.5 0.5 -0.7" diffuse="0.5 0.5 0.5"/>
+    <light pos="-1.5 -1.5 2" dir="0.5 0.5 -0.7" diffuse="0.5 0.5 0.5"/>
+
+    <!-- Стол -->
+    <geom name="table_top" type="box" size="0.5 0.35 0.02" pos="0 0 0.5" material="table_mat"/>
+    <geom name="table_leg1" type="cylinder" size="0.04 0.25" pos="0.42 0.28 0.25" material="table_mat"/>
+    <geom name="table_leg2" type="cylinder" size="0.04 0.25" pos="-0.42 0.28 0.25" material="table_mat"/>
+    <geom name="table_leg3" type="cylinder" size="0.04 0.25" pos="0.42 -0.28 0.25" material="table_mat"/>
+    <geom name="table_leg4" type="cylinder" size="0.04 0.25" pos="-0.42 -0.28 0.25" material="table_mat"/>
+
+    <!-- КРОССОВОК - euler как в world.xml: -90 180 180 -->
+    <body name="sneaker" pos="0 0 0.53">
+      <geom name="sneaker_geom" type="mesh" mesh="sneakers_mesh" material="sneakers_mat"
+            euler="-90 180 180"/>
+    </body>
+
+    <!-- ============ КАМЕРЫ (xyaxes формат) ============ -->
+
+    <!-- Фронтальная - смотрит на кроссовок спереди -->
+    <camera name="front_cam" pos="0 -0.9 0.7" xyaxes="1 0 0 0 0.3 1" fovy="50"/>
+
+    <!-- Сбоку справа (камера на +X, смотрит на -X) -->
+    <camera name="side_right_cam" pos="0.9 0 0.7" xyaxes="0 1 0 -0.3 0 1" fovy="50"/>
+
+    <!-- Сбоку слева (камера на -X, смотрит на +X) -->
+    <camera name="side_left_cam" pos="-0.9 0 0.7" xyaxes="0 -1 0 0.3 0 1" fovy="50"/>
+
+    <!-- Сверху под углом 45° (смотрит с Y-) -->
+    <camera name="top45_cam" pos="0 -0.7 1.1" xyaxes="1 0 0 0 0.7 0.7" fovy="50"/>
+
+    <!-- Сверху вертикально -->
+    <camera name="top_cam" pos="0 0 1.4" xyaxes="1 0 0 0 1 0" fovy="55"/>
+
+  </worldbody>
+</mujoco>

@@ -1,7 +1,7 @@
 import mujoco
 import mujoco.viewer
 
-model = mujoco.MjModel.from_xml_path("world.xml")
+model = mujoco.MjModel.from_xml_path("world_pose_test.xml")
 data = mujoco.MjData(model)
 
 with mujoco.viewer.launch_passive(model, data) as viewer:

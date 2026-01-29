@@ -1,4 +1,4 @@
-import os
+﻿import os
 import mujoco
 import cv2
 from ultralytics import YOLO
@@ -43,8 +43,9 @@ for cam_name in cameras:
 
     # Print detections
     print(f"\n=== {cam_name} ===")
-    if len(results[0].boxes) > 0:
-        for box in results[0].boxes:
+    boxes = results[0].boxes
+    if boxes is not None and len(boxes) > 0:
+        for box in boxes:
             cls_id = int(box.cls[0])
             cls_name = yolo.names[cls_id]
             conf = float(box.conf[0])
@@ -54,3 +55,4 @@ for cam_name in cameras:
 
 print(f"\nModel: {model_path}")
 print(f"Saved frames for all {len(cameras)} cameras to {output_dir}/")
+

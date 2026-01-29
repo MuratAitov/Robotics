@@ -1,71 +1,111 @@
 # MuJoCo Sneaker Vision
 
-Render sneaker models in MuJoCo and run YOLO detection on rendered frames.
+Render sneaker models in MuJoCo, run YOLO detection, and estimate 6DoF pose with FoundationPose for robotic grasping.
 
-## What's inside
+## Features
 
-- MuJoCo world with sneaker meshes (`world.xml`)
-- Viewer script for interactive inspection (`run_viewer.py`)
-- Renderer + YOLO inference (`run_yolo.py`)
-- Sneaker assets in `Sneakers/`
-- YOLO training notes in `YOLO.md`
+- MuJoCo physics simulation with sneaker models
+- YOLOv8 object detection (fine-tuned on footwear)
+- **6DoF Pose Estimation** with NVIDIA FoundationPose
+- Direction vector visualization for robot gripper orientation
 
 ## Folder structure
 
 ```
 .
-+-- Sneakers/                 # 3D assets (OBJ + MTL + textures)
-+-- outputs/                  # Generated images (frames + detections)
-+-- previews/                 # Preview renders of assets
-+-- run_viewer.py             # MuJoCo GUI viewer
-+-- run_yolo.py               # Render + YOLO inference
-+-- world.xml                 # Scene definition
-+-- requirements.txt
-+-- YOLO.md                   # Training, inference, and improvements
+├── Sneakers/                 # 3D assets (OBJ + MTL + textures)
+├── FoundationPose/           # 6DoF pose estimation
+│   ├── run_sneaker.py        # Pose estimation script
+│   ├── weights/              # Model weights (download separately)
+│   └── demo_data/            # RGB/Depth/Mask data
+├── outputs/                  # Generated images
+│   ├── frames/               # Raw MuJoCo renders
+│   ├── yolo/                 # YOLO detection overlays
+│   └── pose_with_arrow/      # Pose visualization with direction arrows
+├── run_viewer.py             # MuJoCo GUI viewer
+├── run_yolo.py               # Render + YOLO inference
+├── generate_pose_data.py     # Generate RGB+Depth+Mask for FoundationPose
+├── render_with_arrow.py      # Visualize direction vectors in MuJoCo
+├── world.xml                 # Main scene
+├── world_pose_test.xml       # Pose estimation test scene
+└── requirements.txt
 ```
 
 ## Setup (Windows)
 
-Create and activate a virtual environment:
-
 ```powershell
 py -3.11 -m venv .venv
 .\.venv\Scripts\Activate.ps1
-```
-
-Install dependencies:
-
-```powershell
 pip install -r requirements.txt
 ```
 
-## Run
+## Usage
 
-### Viewer (interactive)
+### 1. Interactive Viewer
 
 ```powershell
 python run_viewer.py
 ```
 
-### Render + YOLO
+### 2. YOLO Detection
 
 ```powershell
 python run_yolo.py
 ```
 
-Outputs:
-- `outputs/frames/` - raw renders
-- `outputs/yolo/` - YOLO overlays
+### 3. 6DoF Pose Estimation
 
-## Changing sneaker models
+**Prerequisites:** Docker Desktop with GPU support
 
-Edit the mesh paths in `world.xml`, for example:
+```powershell
+# Download FoundationPose weights (~260MB)
+cd FoundationPose
+gdown --folder https://drive.google.com/drive/folders/1DFezOAD0oD1BblsXVxqDsl8fj0qzB82i -O weights/
 
-```xml
-<mesh name="sneaker_mesh" file="Sneakers/sneaker/sneaker.obj" scale="1 1 1"/>
+# Pull Docker image (~12GB)
+docker pull shingarey/foundationpose_custom_cuda121:latest
 ```
 
-## Notes
+**Run pose estimation:**
 
-- Default YOLO models are not trained for sneakers, so detections may be weak.
-- Fine-tune YOLO on footwear or render synthetic data for best results.
+```powershell
+# Generate RGB + Depth + Mask from MuJoCo
+python generate_pose_data.py world_pose_test.xml
+
+# Run FoundationPose in Docker
+docker run --rm --gpus all --env NVIDIA_DISABLE_REQUIRE=1 ^
+  -v "%CD%\FoundationPose:/workspace/FoundationPose" ^
+  --ipc=host shingarey/foundationpose_custom_cuda121:latest ^
+  bash -c "cd /workspace/FoundationPose && python run_sneaker.py --debug 0"
+```
+
+**Visualize results:**
+
+```powershell
+python render_with_arrow.py
+```
+
+## Output Format
+
+Pose estimation outputs `FoundationPose/sneaker_poses.json`:
+
+```json
+{
+  "position": [x, y, z],
+  "direction_vector": [dx, dy, dz],
+  "rotation_matrix": [[...], ...],
+  "pose_4x4": [[...], ...]
+}
+```
+
+- **position** - 3D coordinates for robot approach
+- **direction_vector** - Unit vector showing sneaker orientation (for gripper alignment)
+- **rotation_matrix** - Full 3x3 rotation
+- **pose_4x4** - SE(3) transformation matrix
+
+## Tech Stack
+
+- **Physics:** MuJoCo
+- **Detection:** YOLOv8 (ultralytics)
+- **Pose Estimation:** NVIDIA FoundationPose
+- **GPU:** NVIDIA RTX (tested on 4070 SUPER)

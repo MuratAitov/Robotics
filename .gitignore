@@ -6,6 +6,8 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 .venv/
+.vscode/
+.claude/
 
 # Model weights and outputs
 yolov8n.pt
@@ -14,10 +16,23 @@ yolo_out.png
 outputs/
 data/
 *.pt
+runs/
 
 # Temporary
 *.log
 *.tmp
+temp_scene_*.xml
+nul
 
 # Assets (large)
 Sneakers/
+
+# FoundationPose (large files)
+FoundationPose/weights/
+FoundationPose/demo_data/
+FoundationPose/*.so
+FoundationPose/debug*/
+FoundationPose/sneaker_poses.json
+
+# Claude related
+CLAUDE.md
